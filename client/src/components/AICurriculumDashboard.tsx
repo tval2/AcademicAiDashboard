@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseCSV } from "@/utils/csvParser";
@@ -6,6 +6,7 @@ import HeatmapView from "@/components/HeatmapView";
 import CourseView from "@/components/CourseView";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export type CSVRow = {
   [key: string]: string;
@@ -14,6 +15,8 @@ export type CSVRow = {
 const AICurriculumDashboard: React.FC = () => {
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [activeTab, setActiveTab] = useState("heatmap");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -21,13 +24,55 @@ const AICurriculumDashboard: React.FC = () => {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      if (text) {
-        const data = parseCSV(text);
-        setCsvData(data);
+      try {
+        const text = e.target?.result as string;
+        if (text) {
+          const data = parseCSV(text);
+          if (data.length > 0) {
+            setCsvData(data);
+            toast({
+              title: "CSV Uploaded Successfully",
+              description: `Loaded ${data.length} rows of data`,
+              variant: "default",
+            });
+          } else {
+            toast({
+              title: "Upload Error",
+              description: "No data found in CSV or format is incorrect",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing CSV:", error);
+        toast({
+          title: "Upload Error",
+          description: "Failed to parse CSV file. Please check the format.",
+          variant: "destructive",
+        });
       }
     };
+    
+    reader.onerror = () => {
+      toast({
+        title: "Upload Error",
+        description: "Failed to read the file",
+        variant: "destructive",
+      });
+    };
+    
     reader.readAsText(file);
+    
+    // Reset file input to allow selecting the same file again
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   return (
@@ -36,18 +81,23 @@ const AICurriculumDashboard: React.FC = () => {
         <h1 className="text-2xl font-semibold text-slate-800">
           MIT Sloan AI Curriculum Dashboard
         </h1>
-        <label className="cursor-pointer">
-          <Button variant="outline" className="gap-2">
+        <div>
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={handleButtonClick}
+          >
             <Upload size={16} />
             <span>Upload CSV</span>
           </Button>
           <input
+            ref={fileInputRef}
             type="file"
             accept=".csv"
             onChange={handleFileUpload}
             className="hidden"
           />
-        </label>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">

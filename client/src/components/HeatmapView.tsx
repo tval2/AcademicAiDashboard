@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { CSVRow } from "./AICurriculumDashboard";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AREA_ORDER, AREA_MAPPING, SUBCAT, DEPTHS } from "@/utils/hierarchyData";
 import MergedTable from "./MergedTable";
 
@@ -74,32 +73,21 @@ const HeatmapView: React.FC<HeatmapViewProps> = ({ csvData }) => {
     }
     
     // Create tooltip content with bullet list
-    const tooltipContent = (
-      <div className="max-h-[200px] overflow-y-auto text-left">
-        {courses.map((course, i) => (
-          <div key={i} className="py-0.5">• {course}</div>
-        ))}
-      </div>
-    );
+    const tooltipText = `Courses (${count}):\n${courses.map(course => `• ${course}`).join('\n')}`;
     
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className={`${count >= 3 ? "bg-slate-200" : ""} w-full h-full flex items-center justify-center`}>
-              <span className="text-green-500">✅</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="p-2 max-w-xs w-auto">
-            {tooltipContent}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div 
+        className={`${count >= 3 ? "bg-slate-200" : ""} w-full h-full flex items-center justify-center cursor-help`}
+        title={tooltipText}
+        data-courses={JSON.stringify(courses)}
+      >
+        <span className="text-green-500">✅</span>
+      </div>
     );
   };
 
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full">
       <MergedTable
         data={heatmapData}
         renderCell={(area, category, subcategory, depth) => 
@@ -112,7 +100,7 @@ const HeatmapView: React.FC<HeatmapViewProps> = ({ csvData }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-y-1 gap-x-4">
           <div className="flex items-center">
             <span className="inline-block text-green-500 mr-2">✅</span>
-            <span>1 or more courses</span>
+            <span>1 or more courses (hover to see list)</span>
           </div>
           <div className="flex items-center">
             <span className="inline-block text-red-500 mr-2">❌</span>

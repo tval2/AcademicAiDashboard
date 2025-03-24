@@ -13,12 +13,6 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from "@/components/ui/popover";
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -139,19 +133,15 @@ const CourseView: React.FC<CourseViewProps> = ({ csvData }) => {
       return <span className="text-red-500">❌</span>;
     }
     
+    // Use title attribute for tooltip
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-green-500">✅</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="p-2 max-w-xs w-auto">
-            <div className="text-left">{justification}</div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <div 
+        className="w-full h-full flex items-center justify-center cursor-help"
+        title={`Justification: ${justification}`}
+        data-justification={justification}
+      >
+        <span className="text-green-500">✅</span>
+      </div>
     );
   };
 
@@ -229,6 +219,20 @@ const CourseView: React.FC<CourseViewProps> = ({ csvData }) => {
                 renderCell(area, category, subcategory, depth)
               }
             />
+            
+            <div className="mt-4 p-3 bg-slate-50 rounded-md border border-slate-200 text-xs text-slate-600">
+              <p className="font-semibold mb-2">Legend:</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-1 gap-x-4">
+                <div className="flex items-center">
+                  <span className="inline-block text-green-500 mr-2">✅</span>
+                  <span>Course covers this area (hover to see justification)</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="inline-block text-red-500 mr-2">❌</span>
+                  <span>Course does not cover this area</span>
+                </div>
+              </div>
+            </div>
           </div>
         </>
       )}
