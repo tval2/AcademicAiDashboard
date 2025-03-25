@@ -51,6 +51,11 @@ const MergedTable: React.FC<MergedTableProps> = ({ data, renderCell }) => {
               key={`area-${area}`}
               rowSpan={areaRowCount}
               className="border border-slate-200 px-2 py-2 align-middle bg-slate-50 w-12"
+              style={{
+                height: `${areaRowCount * 40}px`, // Explicitly set height based on row count
+                maxHeight: `${areaRowCount * 40}px`,
+                overflow: "hidden",
+              }}
             >
               <div
                 className="transform -rotate-180 text-sm font-medium text-slate-700 h-full flex items-center justify-center whitespace-nowrap"
@@ -171,7 +176,18 @@ const MergedTable: React.FC<MergedTableProps> = ({ data, renderCell }) => {
             ))}
           </tr>
         </thead>
-        <tbody>{tableRows}</tbody>
+        <tbody>
+          {tableRows.map((row) =>
+            React.cloneElement(row as React.ReactElement, {
+              style: {
+                ...(row as React.ReactElement).props.style,
+                height: "40px", // Override any previous height settings
+                maxHeight: "40px",
+              },
+              className: `${(row as React.ReactElement).props.className || ""} h-10`,
+            }),
+          )}
+        </tbody>
       </table>
     </div>
   );
