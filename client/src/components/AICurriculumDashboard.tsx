@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseCSV } from "@/utils/csvParser";
 import HeatmapView from "@/components/HeatmapView";
 import CourseView from "@/components/CourseView";
+import VennDiagramView from "@/components/VennDiagramView";
+import DataTableView from "@/components/DataTableView";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -52,7 +54,7 @@ const AICurriculumDashboard: React.FC = () => {
         });
       }
     };
-    
+
     reader.onerror = () => {
       toast({
         title: "Upload Error",
@@ -60,12 +62,12 @@ const AICurriculumDashboard: React.FC = () => {
         variant: "destructive",
       });
     };
-    
+
     reader.readAsText(file);
-    
+
     // Reset file input to allow selecting the same file again
     if (event.target) {
-      event.target.value = '';
+      event.target.value = "";
     }
   };
 
@@ -82,8 +84,8 @@ const AICurriculumDashboard: React.FC = () => {
           MIT Sloan AI Curriculum Dashboard
         </h1>
         <div>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="gap-2"
             onClick={handleButtonClick}
           >
@@ -104,6 +106,8 @@ const AICurriculumDashboard: React.FC = () => {
         <TabsList>
           <TabsTrigger value="heatmap">Heatmap View</TabsTrigger>
           <TabsTrigger value="course">Course View</TabsTrigger>
+          <TabsTrigger value="venn">Venn Diagram</TabsTrigger>
+          <TabsTrigger value="data">Data Table</TabsTrigger>
         </TabsList>
 
         <TabsContent value="heatmap">
@@ -113,13 +117,16 @@ const AICurriculumDashboard: React.FC = () => {
                 AI Curriculum Coverage Heatmap
               </CardTitle>
               <p className="text-sm text-slate-500">
-                Overview of course distribution across all areas, categories, and subcategories
+                Overview of course distribution across all areas, categories,
+                and subcategories
               </p>
             </CardHeader>
             <CardContent>
               {csvData.length === 0 ? (
                 <div className="py-12 text-center">
-                  <p className="text-slate-500">Please upload a CSV file to view the heatmap</p>
+                  <p className="text-slate-500">
+                    Please upload a CSV file to view the heatmap
+                  </p>
                 </div>
               ) : (
                 <HeatmapView csvData={csvData} />
@@ -141,10 +148,60 @@ const AICurriculumDashboard: React.FC = () => {
             <CardContent>
               {csvData.length === 0 ? (
                 <div className="py-12 text-center">
-                  <p className="text-slate-500">Please upload a CSV file to view course data</p>
+                  <p className="text-slate-500">
+                    Please upload a CSV file to view course data
+                  </p>
                 </div>
               ) : (
                 <CourseView csvData={csvData} />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="venn">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-medium">
+                Course Comparison Venn Diagram
+              </CardTitle>
+              <p className="text-sm text-slate-500">
+                Compare subcategory coverage across 2-3 selected courses
+              </p>
+            </CardHeader>
+            <CardContent>
+              {csvData.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-slate-500">
+                    Please upload a CSV file to compare courses
+                  </p>
+                </div>
+              ) : (
+                <VennDiagramView csvData={csvData} />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="data">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-medium">
+                Raw Data Table
+              </CardTitle>
+              <p className="text-sm text-slate-500">
+                View and search the uploaded dataset
+              </p>
+            </CardHeader>
+            <CardContent>
+              {csvData.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-slate-500">
+                    Please upload a CSV file to view the data
+                  </p>
+                </div>
+              ) : (
+                <DataTableView csvData={csvData} />
               )}
             </CardContent>
           </Card>
