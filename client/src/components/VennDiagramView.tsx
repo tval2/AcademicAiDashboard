@@ -45,6 +45,9 @@ const VennDiagramView: React.FC<VennDiagramViewProps> = ({ csvData }) => {
     "",
   ]);
 
+  // State for the current search text in the dropdown
+  const [searchTerm, setSearchTerm] = useState("");
+
   // 1) Gather all course names
   const allCourses = useMemo(() => {
     const unique = new Set<string>();
@@ -234,20 +237,22 @@ const VennDiagramView: React.FC<VennDiagramViewProps> = ({ csvData }) => {
                     <input
                       className="w-full focus:outline-none placeholder:text-gray-400 text-sm"
                       placeholder="Search courses..."
-                      onChange={() => {
-                        // If you need live filtering, do it here or rely on the library
-                      }}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
                   <ScrollArea className="h-48">
                     {/* For the 3rd slot, allow 'none' */}
                     {i === 2 && <SelectItem value="none">No Course</SelectItem>}
 
-                    {getAvailableCourses(i).map((course) => (
-                      <SelectItem key={course} value={course}>
-                        {course}
-                      </SelectItem>
-                    ))}
+                    {getAvailableCourses(i)
+                      .filter((course) =>
+                        course.toLowerCase().includes(searchTerm.toLowerCase()),
+                      )
+                      .map((course) => (
+                        <SelectItem key={course} value={course}>
+                          {course}
+                        </SelectItem>
+                      ))}
                   </ScrollArea>
                 </SelectContent>
               </Select>
